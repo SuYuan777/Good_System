@@ -25,7 +25,7 @@ $stmt->execute($unit_ids);
 $storehouse_count = $stmt->fetchColumn() ?: 0;
 
 // ========== 固定品类卡片数据（可自行修改品类名称） ==========
-$fixedCategories = ['车辆', '枪支', '弹药'];  // 在这里修改品类名称
+$fixedCategories = ['车辆', '枪支', '导弹'];  // 在这里修改品类名称
 $categoryAmounts = [];
 foreach ($fixedCategories as $cat) {
     $stmt = $pdo->prepare("SELECT SUM(quantity) FROM material WHERE unit_id IN ($placeholders) AND category = ?");
@@ -92,6 +92,7 @@ $cardGradients = [
     '车辆' => 'linear-gradient(135deg, rgba(0, 180, 200, 0.7), rgba(0, 120, 140, 0.7))',
     '枪支' => 'linear-gradient(135deg, rgba(150, 0, 200, 0.7), rgba(100, 0, 150, 0.7))',
     '弹药' => 'linear-gradient(135deg, rgba(230, 120, 0, 0.7), rgba(180, 80, 0, 0.7))',
+    '导弹' => 'linear-gradient(135deg, rgba(230, 120, 0, 0.7), rgba(180, 80, 0, 0.7))',
 ];
 ?>
 <!DOCTYPE html>
