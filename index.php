@@ -133,17 +133,14 @@ $cardGradients = [
             color: #aaddff !important;
             font-weight: 500;
             font-size: 0.95rem;
-            margin: 0 2px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            transition: all 0.25s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-block;
         }
         .nav-link:hover {
-            background: rgba(0, 170, 255, 0.25);
-            color: #ffffff !important;
             transform: translateY(-2px);
             text-shadow: 0 0 5px #0af;
-            box-shadow: 0 2px 8px rgba(0, 170, 255, 0.3);
+            background: rgba(0, 170, 255, 0.1);
+            border-radius: 20px;
         }
         .btn-outline-info {
             border-radius: 20px;
@@ -331,11 +328,13 @@ $cardGradients = [
                 <?php if(in_array($user['role'], ['super_admin','unit_admin'])): ?>
                 <li class="nav-item"><a class="nav-link" href="personnel.php">人员管理</a></li>
                 <?php endif; ?>
+                <?php if($user['role'] == 'super_admin'): ?>
+                <li class="nav-item"><a class="nav-link" href="category_manage.php">品类管理</a></li>
+                <?php endif; ?>
                 <li class="nav-item"><a class="nav-link" href="material.php">物资管理</a></li>
                 <li class="nav-item"><a class="nav-link" href="data_manage.php">数据管理</a></li>
                 <?php if($user['role'] == 'super_admin'): ?>
                 <li class="nav-item"><a class="nav-link" href="log_view.php">日志管理</a></li>
-                <li class="nav-item"><a class="nav-link" href="category_manage.php">品类管理</a></li>
                 <?php endif; ?>
             </ul>
             <span class="navbar-text text-white-50" style="font-size:0.75rem;">欢迎，<?= htmlspecialchars($user['real_name'])?> (<?= $user['role']?>)</span>
@@ -447,5 +446,12 @@ $(function() {
 $('#unitSelector').change(function(){ window.location.href='index.php?unit_id='+$(this).val(); });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 技术服务联系人 -->
+<div style="position: fixed; bottom: 10px; right: 25px; color: rgba(170, 221, 255, 0.7); font-size: 0.75rem; font-weight: 400; text-align: right; line-height: 1.4; z-index: 1000;">
+    技术服务联系人：王靖文<br>
+    电话：17787127675
+</div>
+
 </body>
 </html>
