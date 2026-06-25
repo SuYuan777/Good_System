@@ -125,7 +125,7 @@ $cardGradients = [
         .navbar-brand {
             color: #aaddff !important;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             letter-spacing: 1px;
             transition: all 0.2s;
         }
