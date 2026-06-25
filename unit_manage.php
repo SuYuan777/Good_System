@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $parent_id = $_POST['parent_id'] ?: null;
         $stmt = $pdo->prepare("UPDATE unit SET name=?, parent_id=? WHERE id=?");
         $stmt->execute([$name, $parent_id, $id]);
-        logOperation("编辑单位 ID:{$id}");
+        logOperation("编辑单位: 【{$name}】(ID:{$id})");
         $message = "单位更新成功";
         header("Location: unit_manage.php");
         exit;
@@ -34,9 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 if (isset($_GET['del'])) {
     if (!$is_super) die('权限不足');
     $id = intval($_GET['del']);
+    $dname = $pdo->prepare("SELECT name FROM unit WHERE id=?");
+    $dname->execute([$id]);
+    $dname = $dname->fetchColumn() ?: "ID:$id";
     $stmt = $pdo->prepare("DELETE FROM unit WHERE id=?");
     $stmt->execute([$id]);
-    logOperation("删除单位 ID:{$id}");
+    logOperation("删除单位: 【{$dname}】");
     header("Location: unit_manage.php");
     exit;
 }
@@ -63,7 +66,7 @@ if (isset($_POST['edit_storehouse'])) {
     $name = trim($_POST['name']);
     $stmt = $pdo->prepare("UPDATE storehouse SET name=? WHERE id=?");
     $stmt->execute([$name, $id]);
-    logOperation("编辑库房 ID:{$id}");
+    logOperation("编辑库房: 【{$name}】(ID:{$id})");
     header("Location: unit_manage.php");
     exit;
 }
@@ -71,9 +74,12 @@ if (isset($_POST['edit_storehouse'])) {
 if (isset($_GET['del_storehouse'])) {
     if (!$is_super && $user['role'] != 'unit_admin') die('权限不足');
     $id = intval($_GET['del_storehouse']);
+    $dname = $pdo->prepare("SELECT name FROM storehouse WHERE id=?");
+    $dname->execute([$id]);
+    $dname = $dname->fetchColumn() ?: "ID:$id";
     $stmt = $pdo->prepare("DELETE FROM storehouse WHERE id=?");
     $stmt->execute([$id]);
-    logOperation("删除库房 ID:{$id}");
+    logOperation("删除库房: 【{$dname}】");
     header("Location: unit_manage.php");
     exit;
 }

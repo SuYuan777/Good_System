@@ -10,10 +10,12 @@ $message = '';
 // 处理归还操作
 if (isset($_GET['return_id'])) {
     $record_id = intval($_GET['return_id']);
-    // 获取借用记录信息，用于更新物资数量（实际归还时不需要减少库存，因为借出时已减少库存？我们的设计是物资数量不变，通过借用记录来标记借出数量。但为了库存准确性，在借出时并未减少material.quantity，而是通过计算借出中总数得到可用量。归还时只改变状态）
+    $ri = $pdo->prepare("SELECT br.borrow_quantity, br.borrower_unit, m.name FROM borrow_record br JOIN material m ON br.material_id=m.id WHERE br.id=?");
+    $ri->execute([$record_id]);
+    $ri = $ri->fetch();
     $stmt = $pdo->prepare("UPDATE borrow_record SET status='已归还', actual_return_time=NOW() WHERE id=? AND status='借出中'");
     $stmt->execute([$record_id]);
-    logOperation("归还借用记录 ID: $record_id");
+    logOperation("归还物资: 【{$ri['name']}】数量: {$ri['borrow_quantity']} 归还自: {$ri['borrower_unit']}");
     $message = "归还成功";
     header("Location: borrowed_list.php?msg=归还成功");
     exit;
@@ -23,9 +25,12 @@ if (isset($_GET['return_id'])) {
 if (isset($_POST['extend'])) {
     $record_id = intval($_POST['record_id']);
     $new_due = $_POST['new_due_time'];
+    $ei = $pdo->prepare("SELECT br.borrow_quantity, br.borrower_unit, m.name FROM borrow_record br JOIN material m ON br.material_id=m.id WHERE br.id=?");
+    $ei->execute([$record_id]);
+    $ei = $ei->fetch();
     $stmt = $pdo->prepare("UPDATE borrow_record SET due_time=? WHERE id=?");
     $stmt->execute([$new_due, $record_id]);
-    logOperation("延期借用记录 ID: $record_id 新归还日期: $new_due");
+    logOperation("延期物资: 【{$ei['name']}】数量: {$ei['borrow_quantity']} 借用单位: {$ei['borrower_unit']} 新归还日期: $new_due");
     $message = "延期成功";
     header("Location: borrowed_list.php?msg=延期成功");
     exit;

@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_user'])) {
     } else {
         $stmt = $pdo->prepare("INSERT INTO user (username, password, real_name, unit_id, position, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$username, $password, $real_name, $unit_id, $position, $role, $status]);
-        logOperation("新增用户: $username");
+        logOperation("新增用户: $username ($real_name) 角色: $role");
         $message = "用户添加成功";
     }
 }
@@ -41,18 +41,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_user'])) {
     $position = trim($_POST['position']);
     $role = $_POST['role'];
     $status = $_POST['status'];
+    $uinfo = $pdo->prepare("SELECT username, real_name FROM user WHERE id=?");
+    $uinfo->execute([$id]);
+    $uinfo = $uinfo->fetch();
     $stmt = $pdo->prepare("UPDATE user SET unit_id=?, position=?, role=?, status=? WHERE id=?");
     $stmt->execute([$unit_id, $position, $role, $status, $id]);
-    logOperation("编辑用户 ID: $id");
+    logOperation("编辑用户: {$uinfo['username']} ({$uinfo['real_name']}) 角色: $role 状态: $status");
     $message = "用户更新成功";
 }
 
 // 删除用户
 if (isset($_GET['del'])) {
     $id = intval($_GET['del']);
+    $uinfo = $pdo->prepare("SELECT username, real_name FROM user WHERE id=?");
+    $uinfo->execute([$id]);
+    $uinfo = $uinfo->fetch();
     $stmt = $pdo->prepare("DELETE FROM user WHERE id=?");
     $stmt->execute([$id]);
-    logOperation("删除用户 ID: $id");
+    logOperation("删除用户: {$uinfo['username']} ({$uinfo['real_name']})");
     header("Location: personnel.php");
     exit;
 }
@@ -60,13 +66,14 @@ if (isset($_GET['del'])) {
 // 启用/停用
 if (isset($_GET['toggle'])) {
     $id = intval($_GET['toggle']);
-    $stmt = $pdo->prepare("SELECT status FROM user WHERE id=?");
+    $stmt = $pdo->prepare("SELECT status, username, real_name FROM user WHERE id=?");
     $stmt->execute([$id]);
-    $cur = $stmt->fetchColumn();
+    $urow = $stmt->fetch();
+    $cur = $urow['status'];
     $new = ($cur == '启用') ? '停用' : '启用';
     $stmt = $pdo->prepare("UPDATE user SET status=? WHERE id=?");
     $stmt->execute([$new, $id]);
-    logOperation("切换用户状态 ID: $id -> $new");
+    logOperation("切换用户状态: {$urow['username']} ({$urow['real_name']}) $cur → $new");
     header("Location: personnel.php");
     exit;
 }

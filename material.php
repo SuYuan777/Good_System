@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_material'])) {
     $status = $_POST['status'];
     $stmt = $pdo->prepare("INSERT INTO material (code, name, category, unit_id, storehouse_id, shelf, location, quantity, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$code, $name, $category, $unit_id, $storehouse_id, $shelf, $location, $quantity, $status]);
-    logOperation("新增物资: $name");
+    logOperation("新增物资: $name, 品类: $category, 数量: $quantity");
     $message = "物资添加成功";
 }
 
@@ -43,18 +43,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_material'])) {
     if (!$mat_unit || !in_array($mat_unit, $allowed_unit_ids)) {
         die("无权限编辑此物资");
     }
+    $uname = $pdo->prepare("SELECT name FROM unit WHERE id=?");
+    $uname->execute([$unit_id]);
+    $uname = $uname->fetchColumn();
     $stmt = $pdo->prepare("UPDATE material SET code=?, name=?, category=?, unit_id=?, storehouse_id=?, shelf=?, location=?, quantity=?, status=? WHERE id=?");
     $stmt->execute([$code, $name, $category, $unit_id, $storehouse_id, $shelf, $location, $quantity, $status, $id]);
-    logOperation("编辑物资 ID: $id");
+    logOperation("编辑物资: $name, 品类: $category, 数量: $quantity, 单位: $uname");
     $message = "物资编辑成功";
 }
 
 // 处理删除物资
 if (isset($_GET['del_material'])) {
     $id = intval($_GET['del_material']);
+    $di = $pdo->prepare("SELECT name, category, quantity FROM material WHERE id=?");
+    $di->execute([$id]);
+    $di = $di->fetch();
     $stmt = $pdo->prepare("DELETE FROM material WHERE id=? AND unit_id IN ($allowed_placeholders)");
     $stmt->execute(array_merge([$id], $allowed_unit_ids));
-    logOperation("删除物资 ID: $id");
+    logOperation("删除物资: {$di['name']}, 品类: {$di['category']}, 数量: {$di['quantity']}");
     header("Location: material.php");
     exit;
 }

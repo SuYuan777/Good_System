@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_category'])) {
     } else {
         $stmt = $pdo->prepare("UPDATE category SET name=?, status=? WHERE id=?");
         if ($stmt->execute([$name, $status, $id])) {
-            logOperation("编辑物资品类 ID: $id");
+            logOperation("编辑物资品类: 【{$name}】状态: {$status}");
             $message = "品类更新成功";
         } else {
             $message = "更新失败，可能名称重复";
@@ -40,7 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_category'])) {
 // 处理删除
 if (isset($_GET['del'])) {
     $id = intval($_GET['del']);
-    // 检查是否有物资使用此品类
+    $catname = $pdo->prepare("SELECT name FROM category WHERE id=?");
+    $catname->execute([$id]);
+    $catname = $catname->fetchColumn() ?: "ID:$id";
     $check = $pdo->prepare("SELECT COUNT(*) FROM material WHERE category = (SELECT name FROM category WHERE id=?)");
     $check->execute([$id]);
     $count = $check->fetchColumn();
@@ -49,7 +51,7 @@ if (isset($_GET['del'])) {
     } else {
         $stmt = $pdo->prepare("DELETE FROM category WHERE id=?");
         $stmt->execute([$id]);
-        logOperation("删除物资品类 ID: $id");
+        logOperation("删除物资品类: 【{$catname}】");
         $message = "品类删除成功";
         header("Location: category_manage.php");
         exit;
