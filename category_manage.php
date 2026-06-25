@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
     if (empty($name)) {
         $message = "品类名称不能为空";
     } else {
-        $stmt = $pdo->prepare("INSERT INTO category (name) VALUES (?)");
+        $stmt = $pdo->prepare("INSERT INTO category (name, status) VALUES (?, '启用')");
         if ($stmt->execute([$name])) {
             logOperation("新增物资品类: $name");
             $message = "品类添加成功";
