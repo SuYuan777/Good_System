@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_material'])) {
 if (isset($_GET['del_material'])) {
     $id = intval($_GET['del_material']);
     $stmt = $pdo->prepare("DELETE FROM material WHERE id=? AND unit_id IN ($allowed_placeholders)");
-    $stmt->execute([$id]);
+    $stmt->execute(array_merge([$id], $allowed_unit_ids));
     logOperation("删除物资 ID: $id");
     header("Location: material.php");
     exit;
