@@ -72,7 +72,7 @@ include 'includes/header.php';
 <div class="table-responsive">
     <table class="table table-bordered table-striped">
         <thead>
-            <tr><th>操作时间</th><th>姓名</th><th>用户名</th><th>操作详情</th><th>IP地址</th></tr>
+            <tr><th style="width:145px">操作时间</th><th>姓名</th><th>用户名</th><th>操作详情</th><th>IP地址</th></tr>
         </thead>
         <tbody>
         <?php foreach($logs as $log): ?>
