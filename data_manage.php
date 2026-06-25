@@ -73,7 +73,7 @@ if (isset($_GET['export_category_action'])) {
 include 'includes/header.php';
 ?>
 
-<h2>数据管理</h2>
+<h2>数据导出</h2>
 <?php if($message) echo "<div class='alert alert-info'>$message</div>"; ?>
 
 <div class="row">
