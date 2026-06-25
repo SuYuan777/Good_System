@@ -25,7 +25,7 @@ $stmt->execute($unit_ids);
 $storehouse_count = $stmt->fetchColumn() ?: 0;
 
 // ========== 固定品类卡片数据（可自行修改品类名称） ==========
-$fixedCategories = ['通信', '器材', '营房', '供应'];  // 在这里修改品类名称
+$fixedCategories = ['车辆', '枪支', '弹药'];  // 在这里修改品类名称
 $categoryAmounts = [];
 foreach ($fixedCategories as $cat) {
     $stmt = $pdo->prepare("SELECT SUM(quantity) FROM material WHERE unit_id IN ($placeholders) AND category = ?");
@@ -89,10 +89,9 @@ if (!file_exists($mapImagePath)) {
 
 // 为品类卡片准备不同的渐变背景（对应四个固定品类，可自定义）
 $cardGradients = [
-    '通信' => 'linear-gradient(135deg, rgba(0, 180, 200, 0.7), rgba(0, 120, 140, 0.7))',
-    '器材' => 'linear-gradient(135deg, rgba(150, 0, 200, 0.7), rgba(100, 0, 150, 0.7))',
-    '营房' => 'linear-gradient(135deg, rgba(230, 120, 0, 0.7), rgba(180, 80, 0, 0.7))',
-    '供应' => 'linear-gradient(135deg, rgba(0, 180, 60, 0.7), rgba(0, 120, 40, 0.7))',
+    '车辆' => 'linear-gradient(135deg, rgba(0, 180, 200, 0.7), rgba(0, 120, 140, 0.7))',
+    '枪支' => 'linear-gradient(135deg, rgba(150, 0, 200, 0.7), rgba(100, 0, 150, 0.7))',
+    '弹药' => 'linear-gradient(135deg, rgba(230, 120, 0, 0.7), rgba(180, 80, 0, 0.7))',
 ];
 ?>
 <!DOCTYPE html>
@@ -368,7 +367,7 @@ $cardGradients = [
         <?php foreach ($fixedCategories as $cat):
             $gradient = $cardGradients[$cat] ?? 'linear-gradient(135deg, rgba(80,80,120,0.7), rgba(40,40,80,0.7))';
         ?>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="stat-card-category" style="background: <?= $gradient ?>;">
                 <h6><?= $cat ?>物资总数</h6>
                 <div class="category-value"><?= $categoryAmounts[$cat] ?></div>
