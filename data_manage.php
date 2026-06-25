@@ -8,14 +8,28 @@ $allowed_placeholders = implode(',', array_fill(0, count($allowed_unit_ids), '?'
 $message = '';
 
 // 导出处理（按单位+库房）
-if (isset($_GET['export_storehouse'])) {
+if (isset($_GET['export_storehouse_action'])) {
     $export_unit = intval($_GET['export_unit']);
     $export_storehouse = intval($_GET['export_storehouse']);
     if (!in_array($export_unit, $allowed_unit_ids)) die("无权限导出该单位数据");
-    $sql = "SELECT m.code, m.name, m.category, u.name as unit_name, s.name as storehouse_name, m.shelf, m.location, m.quantity, m.status 
-            FROM material m 
-            LEFT JOIN unit u ON m.unit_id = u.id 
-            LEFT JOIN storehouse s ON m.storehouse_id = s.id 
+
+    // 获取单位名称
+    $unit_stmt = $pdo->prepare("SELECT name FROM unit WHERE id = ?");
+    $unit_stmt->execute([$export_unit]);
+    $unit_name = $unit_stmt->fetchColumn() ?: "未知单位";
+
+    // 获取库房名称
+    $storehouse_name = "全部库房";
+    if ($export_storehouse > 0) {
+        $sh_stmt = $pdo->prepare("SELECT name FROM storehouse WHERE id = ?");
+        $sh_stmt->execute([$export_storehouse]);
+        $storehouse_name = $sh_stmt->fetchColumn() ?: "未知库房";
+    }
+
+    $sql = "SELECT m.code, m.name, m.category, u.name as unit_name, s.name as storehouse_name, m.shelf, m.location, m.quantity, m.status
+            FROM material m
+            LEFT JOIN unit u ON m.unit_id = u.id
+            LEFT JOIN storehouse s ON m.storehouse_id = s.id
             WHERE m.unit_id = ?";
     $params = [$export_unit];
     if ($export_storehouse > 0) {
@@ -24,29 +38,35 @@ if (isset($_GET['export_storehouse'])) {
     }
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    $data = $stmt->fetchAll();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $headers = ['物资编码', '物资名称', '品类', '所属单位', '库房', '货架', '货架位置', '数量', '状态'];
-    exportToExcel("物资明细_单位{$export_unit}_库房{$export_storehouse}", $headers, $data);
+    exportToExcel("物资明细_{$unit_name}_{$storehouse_name}", $headers, $data);
     exit;
 }
 
 // 导出处理（按单位+品类）
-if (isset($_GET['export_category'])) {
+if (isset($_GET['export_category_action'])) {
     $export_unit = intval($_GET['export_unit']);
     $export_category = $_GET['export_category'];
     if (!in_array($export_unit, $allowed_unit_ids)) die("无权限导出该单位数据");
     $valid_cats = ['供应', '营房', '运输', '通信', '器材'];
     if (!in_array($export_category, $valid_cats)) die("无效的品类");
-    $sql = "SELECT m.code, m.name, m.category, u.name as unit_name, s.name as storehouse_name, m.shelf, m.location, m.quantity, m.status 
-            FROM material m 
-            LEFT JOIN unit u ON m.unit_id = u.id 
-            LEFT JOIN storehouse s ON m.storehouse_id = s.id 
+
+    // 获取单位名称
+    $unit_stmt = $pdo->prepare("SELECT name FROM unit WHERE id = ?");
+    $unit_stmt->execute([$export_unit]);
+    $unit_name = $unit_stmt->fetchColumn() ?: "未知单位";
+
+    $sql = "SELECT m.code, m.name, m.category, u.name as unit_name, s.name as storehouse_name, m.shelf, m.location, m.quantity, m.status
+            FROM material m
+            LEFT JOIN unit u ON m.unit_id = u.id
+            LEFT JOIN storehouse s ON m.storehouse_id = s.id
             WHERE m.unit_id = ? AND m.category = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$export_unit, $export_category]);
-    $data = $stmt->fetchAll();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $headers = ['物资编码', '物资名称', '品类', '所属单位', '库房', '货架', '货架位置', '数量', '状态'];
-    exportToExcel("物资明细_单位{$export_unit}_品类{$export_category}", $headers, $data);
+    exportToExcel("物资明细_{$unit_name}_品类{$export_category}", $headers, $data);
     exit;
 }
 
@@ -63,7 +83,7 @@ include 'includes/header.php';
             <div class="card-header bg-primary text-white">按单位 + 库房导出物资明细</div>
             <div class="card-body">
                 <form method="get" action="" id="formStorehouse">
-                    <input type="hidden" name="export_storehouse" value="1">
+                    <input type="hidden" name="export_storehouse_action" value="1">
                     <div class="mb-3">
                         <label class="form-label">选择单位</label>
                         <select name="export_unit" id="export_unit_storehouse" class="form-select" required>
@@ -79,7 +99,7 @@ include 'includes/header.php';
                     <div class="mb-3">
                         <label class="form-label">选择库房</label>
                         <select name="export_storehouse" id="export_storehouse_select" class="form-select">
-                            <option value="">全部库房</option>
+                            <option value="0">全部库房</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-success">导出 Excel (CSV)</button>
@@ -94,7 +114,7 @@ include 'includes/header.php';
             <div class="card-header bg-primary text-white">按单位 + 品类导出物资明细</div>
             <div class="card-body">
                 <form method="get" action="">
-                    <input type="hidden" name="export_category" value="1">
+                    <input type="hidden" name="export_category_action" value="1">
                     <div class="mb-3">
                         <label class="form-label">选择单位</label>
                         <select name="export_unit" id="export_unit_category" class="form-select" required>
@@ -148,19 +168,19 @@ $(function(){
     $('#export_unit_storehouse').change(function(){
         var unitId = $(this).val();
         var $storehouseSelect = $('#export_storehouse_select');
-        $storehouseSelect.html('<option value="">加载中...</option>');
+        $storehouseSelect.html('<option value="0">加载中...</option>');
         if (unitId === '') {
-            $storehouseSelect.html('<option value="">全部库房</option>');
+            $storehouseSelect.html('<option value="0">全部库房</option>');
             return;
         }
         $.getJSON('get_storehouses.php?unit_id=' + unitId, function(data){
-            var options = '<option value="">全部库房</option>';
+            var options = '<option value="0">全部库房</option>';
             $.each(data, function(i, sh){
                 options += '<option value="' + sh.id + '">' + sh.name + '</option>';
             });
             $storehouseSelect.html(options);
         }).fail(function(){
-            $storehouseSelect.html('<option value="">加载失败，请重试</option>');
+            $storehouseSelect.html('<option value="0">加载失败，请重试</option>');
         });
     });
 });

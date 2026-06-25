@@ -40,10 +40,7 @@ if (!isset($user) || !$user) {
             font-weight: 600;
             font-size: 1.2rem;
             letter-spacing: 1px;
-            transition: all 0.2s;
-        }
-        .navbar-brand:hover {
-            text-shadow: 0 0 8px #0af;
+            cursor: default;
         }
         .nav-link {
             color: #aaddff !important;
@@ -184,7 +181,7 @@ if (!isset($user) || !$user) {
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/good_system/index.php">物资管理系统</a>
+        <span class="navbar-brand">物资管理系统</span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>

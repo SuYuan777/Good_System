@@ -127,7 +127,7 @@ $cardGradients = [
             font-weight: 600;
             font-size: 1.2rem;
             letter-spacing: 1px;
-            transition: all 0.2s;
+            cursor: default;
         }
         .nav-link {
             color: #aaddff !important;
@@ -320,7 +320,7 @@ $cardGradients = [
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">物资管理系统</a>
+        <span class="navbar-brand">物资管理系统</span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
