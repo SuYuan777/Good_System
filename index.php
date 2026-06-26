@@ -325,16 +325,16 @@ $cardGradients = [
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link active" href="index.php">仪表盘</a></li>
                 <li class="nav-item"><a class="nav-link" href="unit_manage.php">单位管理</a></li>
-                <?php if(in_array($user['role'], ['super_admin','unit_admin'])): ?>
+                <?php if(in_array($user['role'], ['super_admin','inspector','unit_admin'])): ?>
                 <li class="nav-item"><a class="nav-link" href="personnel.php">人员管理</a></li>
                 <?php endif; ?>
-                <?php if($user['role'] == 'super_admin'): ?>
+                <?php if(in_array($user['role'], ['super_admin','inspector'])): ?>
                 <li class="nav-item"><a class="nav-link" href="category_manage.php">品类管理</a></li>
                 <?php endif; ?>
                 <li class="nav-item"><a class="nav-link" href="material.php">物资管理</a></li>
                 <li class="nav-item"><a class="nav-link" href="material_query.php">物资查询</a></li>
                 <li class="nav-item"><a class="nav-link" href="data_manage.php">数据导出</a></li>
-                <?php if($user['role'] == 'super_admin'): ?>
+                <?php if(in_array($user['role'], ['super_admin','inspector'])): ?>
                 <li class="nav-item"><a class="nav-link" href="log_view.php">日志管理</a></li>
                 <?php endif; ?>
             </ul>

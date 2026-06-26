@@ -144,8 +144,8 @@ include 'includes/header.php';
     </div>
 </div>
 
-<!-- 数据库备份功能（仅超级管理员） -->
-<?php if ($user['role'] == 'super_admin'): ?>
+<!-- 数据库备份功能（仅超级管理员 / 监查员） -->
+<?php if (in_array($user['role'], ['super_admin','inspector'])): ?>
 <div class="row">
     <div class="col-md-12">
         <div class="card">

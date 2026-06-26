@@ -1,11 +1,19 @@
 <?php
 require_once 'config.php';
 $user = checkPermission('operator');
+$can_manage = canManageMaterial($user);
 $unit_id = $user['unit_id'];
 $allowed_unit_ids = getSubUnitIds($unit_id, true);
 $allowed_placeholders = implode(',', array_fill(0, count($allowed_unit_ids), '?'));
 
 $message = '';
+
+// 监查员无写权限：拒绝任何写操作
+if (!$can_manage) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_GET['del_material'])) {
+        die("监查员仅可查看物资信息，无操作权限");
+    }
+}
 
 // 处理新增物资
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_material'])) {
@@ -115,7 +123,7 @@ $category_list = $pdo->query("SELECT name FROM category WHERE status='启用' OR
 include 'includes/header.php';
 ?>
 
-<h2>物资管理</h2>
+<h2>物资管理<?php if(!$can_manage) echo ' <small class="text-muted" style="font-size:0.6em;">（监查员只读）</small>'; ?></h2>
 <?php if($message) echo "<div class='alert alert-success'>$message</div>"; ?>
 
 <!-- 筛选表单 -->
@@ -148,8 +156,10 @@ include 'includes/header.php';
                 </select>
             </div>
             <div class="col-auto"><button type="submit" class="btn btn-primary">筛选</button><a href="material.php" class="btn btn-secondary">重置</a></div>
+            <?php if($can_manage): ?>
             <div class="col-auto"><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">+ 新增物资</button></div>
             <div class="col-auto"><button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importMaterialModal">批量导入</button></div>
+            <?php endif; ?>
             <div class="col-auto"><a href="borrowed_list.php" class="btn btn-warning">借出物资查询</a></div>
         </form>
     </div>
@@ -159,7 +169,7 @@ include 'includes/header.php';
 <div class="table-responsive">
     <table class="table table-bordered table-striped">
         <thead>
-            <tr><th>物资编码</th><th>物资名称</th><th>品类</th><th>所属单位</th><th>库房</th><th>货架</th><th>货架位置</th><th>数量</th><th>状态</th><th>操作</th></tr>
+            <tr><th>物资编码</th><th>物资名称</th><th>品类</th><th>所属单位</th><th>库房</th><th>货架</th><th>货架位置</th><th>数量</th><th>状态</th><?php if($can_manage): ?><th>操作</th><?php endif; ?></tr>
         </thead>
         <tbody>
         <?php foreach($materials as $m):
@@ -178,11 +188,13 @@ include 'includes/header.php';
                 <td><?=htmlspecialchars($m['location'])?></td>
                 <td><?=$display_qty?></td>
                 <td><?=$m['status']?></td>
+                <?php if($can_manage): ?>
                 <td>
                     <button class="btn btn-sm btn-primary borrow-btn" data-id="<?=$m['id']?>" data-name="<?=htmlspecialchars($m['name'])?>" data-max="<?=$m['quantity'] - $borrowed_qty?>">借出</button>
                     <button class="btn btn-sm btn-info edit-material-btn" data-id="<?=$m['id']?>" data-code="<?=htmlspecialchars($m['code'])?>" data-name="<?=htmlspecialchars($m['name'])?>" data-category="<?=$m['category']?>" data-unit="<?=$m['unit_id']?>" data-storehouse="<?=$m['storehouse_id']?>" data-shelf="<?=htmlspecialchars($m['shelf'])?>" data-location="<?=htmlspecialchars($m['location'])?>" data-quantity="<?=$m['quantity']?>" data-status="<?=$m['status']?>">编辑</button>
                     <a href="?del_material=<?=$m['id']?>" class="btn btn-sm btn-danger" onclick="return confirm('确定删除？')">删除</a>
                 </td>
+                <?php endif; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>

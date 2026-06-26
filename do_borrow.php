@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 $user = checkPermission('operator');
+if (!canManageMaterial($user)) die("监查员仅可查看物资信息，无操作权限");
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $material_id = intval($_POST['material_id']);
     $borrow_quantity = intval($_POST['borrow_quantity']);

@@ -1,7 +1,15 @@
 <?php
 require_once 'config.php';
-$user = checkPermission('super_admin'); // 仅系统管理员可管理品类
+$user = checkPermission('super_admin'); // 系统管理员 / 监查员 可进入；监查员只读
+$can_manage = canManageMaterial($user);
 $message = '';
+
+// 监查员（或任何不具备写权限的角色）尝试任何写操作 → 拒绝
+if (!$can_manage) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_GET['del'])) {
+        die("监查员仅可查看品类信息，无操作权限");
+    }
+}
 
 // 处理新增
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
@@ -64,10 +72,11 @@ $categories = $pdo->query("SELECT * FROM category ORDER BY id")->fetchAll();
 include 'includes/header.php';
 ?>
 
-<h2>物资品类管理</h2>
+<h2>物资品类管理<?php if(!$can_manage) echo ' <small class="text-muted" style="font-size:0.6em;">（监查员只读）</small>'; ?></h2>
 <?php if($message) echo "<div class='alert alert-info'>$message</div>"; ?>
 
 <div class="row">
+    <?php if($can_manage): ?>
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">新增品类</div>
@@ -79,13 +88,14 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-    <div class="col-md-8">
+    <?php endif; ?>
+    <div class="<?= $can_manage ? 'col-md-8' : 'col-md-12' ?>">
         <div class="card">
             <div class="card-header">现有品类列表</div>
             <div class="card-body">
                 <table class="table table-bordered table-striped">
                     <thead>
-                        <tr><th>ID</th><th>品类名称</th><th>状态</th><th>创建时间</th><th>操作</th></tr>
+                        <tr><th>ID</th><th>品类名称</th><th>状态</th><th>创建时间</th><?php if($can_manage): ?><th>操作</th><?php endif; ?></tr>
                     </thead>
                     <tbody>
                     <?php foreach($categories as $c): ?>
@@ -94,10 +104,12 @@ include 'includes/header.php';
                         <td><?=htmlspecialchars($c['name'])?></td>
                         <td><span class="badge bg-<?=($c['status']=='启用')?'success':'secondary'?>"><?=$c['status']?></span></td>
                         <td><?=$c['created_at']?></td>
+                        <?php if($can_manage): ?>
                         <td>
                             <button class="btn btn-sm btn-warning edit-category" data-id="<?=$c['id']?>" data-name="<?=htmlspecialchars($c['name'])?>" data-status="<?=$c['status']?>">编辑</button>
                             <a href="?del=<?=$c['id']?>" class="btn btn-sm btn-danger" onclick="return confirm('确定删除？如有物资使用此品类将无法删除')">删除</a>
                         </td>
+                        <?php endif; ?>
                     </tr>
                     <?php endforeach; ?>
                     </tbody>

@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 $user = checkPermission('unit_admin');
-$is_super = ($user['role'] == 'super_admin');
+$is_super = in_array($user['role'], ['super_admin','inspector']);
 $unit_id = $user['unit_id'];
 
 if ($is_super) {
@@ -81,15 +81,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['userfile'])) {
             continue;
         }
         
-        $valid_roles = ['super_admin', 'unit_admin', 'operator'];
+        $valid_roles = ['super_admin', 'inspector', 'unit_admin', 'operator'];
         if (!in_array($role, $valid_roles)) {
             $fail++;
-            $errors[] = "无效的角色：$role，允许值：super_admin, unit_admin, operator";
+            $errors[] = "无效的角色：$role，允许值：super_admin, inspector, unit_admin, operator";
             continue;
         }
-        if (!$is_super && $role == 'super_admin') {
+        if (!$is_super && in_array($role, ['super_admin','inspector'])) {
             $fail++;
-            $errors[] = "您没有权限创建超级管理员用户：$username";
+            $errors[] = "您没有权限创建管理员/监查员用户：$username";
             continue;
         }
         

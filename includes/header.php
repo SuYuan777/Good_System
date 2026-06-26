@@ -189,18 +189,18 @@ if (!isset($user) || !$user) {
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="/good_system/index.php">仪表盘</a></li>
                 <li class="nav-item"><a class="nav-link" href="/good_system/unit_manage.php">单位管理</a></li>
-                <?php if(isset($user) && in_array($user['role'], ['super_admin','unit_admin'])): ?>
+                <?php if(isset($user) && in_array($user['role'], ['super_admin','inspector','unit_admin'])): ?>
                 <li class="nav-item"><a class="nav-link" href="/good_system/personnel.php">人员管理</a></li>
                 <?php endif; ?>
-                <?php if(isset($user) && $user['role'] == 'super_admin'): ?>
+                <?php if(isset($user) && in_array($user['role'], ['super_admin','inspector'])): ?>
                 <li class="nav-item"><a class="nav-link" href="/good_system/category_manage.php">品类管理</a></li>
                 <?php endif; ?>
                 <li class="nav-item"><a class="nav-link" href="/good_system/material.php">物资管理</a></li>
                 <li class="nav-item"><a class="nav-link" href="/good_system/material_query.php">物资查询</a></li>
                 <li class="nav-item"><a class="nav-link" href="/good_system/data_manage.php">数据导出</a></li>
-                <?php if(isset($user) && $user['role'] == 'super_admin'): ?>
+                <?php if(isset($user) && in_array($user['role'], ['super_admin','inspector'])): ?>
                 <li class="nav-item"><a class="nav-link" href="/good_system/log_view.php">日志管理</a></li>
-            
+
                 <?php endif; ?>
             </ul>
             <span class="navbar-text text-white-50" style="font-size:0.75rem;">欢迎，<?= htmlspecialchars($user['real_name'] ?? '')?> (<?= $user['role'] ?? ''?>)</span>

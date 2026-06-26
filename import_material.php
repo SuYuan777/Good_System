@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 $user = checkPermission('operator');
+if (!canManageMaterial($user)) die("监查员仅可查看物资信息，无操作权限");
 $allowed_unit_ids = getSubUnitIds($user['unit_id'], true);
 
 error_reporting(E_ALL);

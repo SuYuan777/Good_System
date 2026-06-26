@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 $user = checkPermission('operator');
-$is_super = ($user['role'] == 'super_admin');
+$is_super = in_array($user['role'], ['super_admin','inspector']);
 $unit_id = $user['unit_id'];
 $message = '';
 
