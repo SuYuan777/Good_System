@@ -101,6 +101,13 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $users = $stmt->fetchAll();
 
+// 角色英文 → 中文映射
+$role_labels = [
+    'super_admin' => '系统管理员',
+    'unit_admin'  => '单位管理员',
+    'operator'    => '普通操作员',
+];
+
 // 单位列表
 if ($is_super) {
     $all_units = $pdo->query("SELECT id, name FROM unit")->fetchAll();
@@ -148,7 +155,7 @@ include 'includes/header.php';
                 <td><?=htmlspecialchars($u['real_name'])?></td>
                 <td><?=htmlspecialchars($u['unit_name'])?></td>
                 <td><?=htmlspecialchars($u['position'])?></td>
-                <td><?=htmlspecialchars($u['role'])?></td>
+                <td><?=htmlspecialchars($role_labels[$u['role']] ?? $u['role'])?></td>
                 <td><span class="badge bg-<?=($u['status']=='启用')?'success':'secondary'?>"><?=$u['status']?></span></td>
                 <td><?=$u['created_at']?></td>
                 <td>
