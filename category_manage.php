@@ -1,13 +1,13 @@
 <?php
 require_once 'config.php';
-$user = checkPermission('super_admin'); // 系统管理员 / 监查员 可进入；监查员只读
+$user = checkPermission('super_admin'); // 系统管理员 / 监察员 可进入；监察员只读
 $can_manage = canManageMaterial($user);
 $message = '';
 
-// 监查员（或任何不具备写权限的角色）尝试任何写操作 → 拒绝
+// 监察员（或任何不具备写权限的角色）尝试任何写操作 → 拒绝
 if (!$can_manage) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_GET['del'])) {
-        die("监查员仅可查看品类信息，无操作权限");
+        die("监察员仅可查看品类信息，无操作权限");
     }
 }
 
@@ -72,7 +72,7 @@ $categories = $pdo->query("SELECT * FROM category ORDER BY id")->fetchAll();
 include 'includes/header.php';
 ?>
 
-<h2>物资品类管理<?php if(!$can_manage) echo ' <small class="text-muted" style="font-size:0.6em;">（监查员只读）</small>'; ?></h2>
+<h2>物资品类管理<?php if(!$can_manage) echo ' <small class="text-muted" style="font-size:0.6em;">（监察员只读）</small>'; ?></h2>
 <?php if($message) echo "<div class='alert alert-info'>$message</div>"; ?>
 
 <div class="row">

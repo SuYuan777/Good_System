@@ -2,7 +2,12 @@
 require_once 'config.php';
 $user = checkPermission('operator');
 $user_unit_id = $user['unit_id'];
-$allowed_unit_ids = getSubUnitIds($user_unit_id, true);
+// 系统管理员 / 监察员可见全部单位；其他角色仅可见所在单位及下级
+if (in_array($user['role'], ['super_admin','inspector'])) {
+    $allowed_unit_ids = $pdo->query("SELECT id FROM unit")->fetchAll(PDO::FETCH_COLUMN);
+} else {
+    $allowed_unit_ids = getSubUnitIds($user_unit_id, true);
+}
 $allowed_placeholders = implode(',', array_fill(0, count($allowed_unit_ids), '?'));
 
 $search_name    = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';

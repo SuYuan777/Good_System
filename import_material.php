@@ -1,8 +1,12 @@
 <?php
 require_once 'config.php';
 $user = checkPermission('operator');
-if (!canManageMaterial($user)) die("监查员仅可查看物资信息，无操作权限");
-$allowed_unit_ids = getSubUnitIds($user['unit_id'], true);
+if (!canManageMaterial($user)) die("监察员仅可查看物资信息，无操作权限");
+if (in_array($user['role'], ['super_admin','inspector'])) {
+    $allowed_unit_ids = $pdo->query("SELECT id FROM unit")->fetchAll(PDO::FETCH_COLUMN);
+} else {
+    $allowed_unit_ids = getSubUnitIds($user['unit_id'], true);
+}
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);

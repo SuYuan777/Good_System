@@ -3,15 +3,20 @@ require_once 'config.php';
 $user = checkPermission('operator');
 $can_manage = canManageMaterial($user);
 $unit_id = $user['unit_id'];
-$allowed_unit_ids = getSubUnitIds($unit_id, true);
+// 系统管理员 / 监察员可见全部单位；其他角色仅可见所在单位及下级
+if (in_array($user['role'], ['super_admin','inspector'])) {
+    $allowed_unit_ids = $pdo->query("SELECT id FROM unit")->fetchAll(PDO::FETCH_COLUMN);
+} else {
+    $allowed_unit_ids = getSubUnitIds($unit_id, true);
+}
 $allowed_placeholders = implode(',', array_fill(0, count($allowed_unit_ids), '?'));
 
 $message = '';
 
-// 监查员无写权限：拒绝任何写操作
+// 监察员无写权限：拒绝任何写操作
 if (!$can_manage) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_GET['del_material'])) {
-        die("监查员仅可查看物资信息，无操作权限");
+        die("监察员仅可查看物资信息，无操作权限");
     }
 }
 
@@ -123,7 +128,7 @@ $category_list = $pdo->query("SELECT name FROM category WHERE status='启用' OR
 include 'includes/header.php';
 ?>
 
-<h2>物资管理<?php if(!$can_manage) echo ' <small class="text-muted" style="font-size:0.6em;">（监查员只读）</small>'; ?></h2>
+<h2>物资管理<?php if(!$can_manage) echo ' <small class="text-muted" style="font-size:0.6em;">（监察员只读）</small>'; ?></h2>
 <?php if($message) echo "<div class='alert alert-success'>$message</div>"; ?>
 
 <!-- 筛选表单 -->

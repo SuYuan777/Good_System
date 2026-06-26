@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['userfile'])) {
         }
         if (!$is_super && in_array($role, ['super_admin','inspector'])) {
             $fail++;
-            $errors[] = "您没有权限创建管理员/监查员用户：$username";
+            $errors[] = "您没有权限创建管理员/监察员用户：$username";
             continue;
         }
         

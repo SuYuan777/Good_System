@@ -2,7 +2,11 @@
 require_once 'config.php';
 $user = checkPermission('operator');
 $unit_id = $user['unit_id'];
-$allowed_unit_ids = getSubUnitIds($unit_id, true);
+if (in_array($user['role'], ['super_admin','inspector'])) {
+    $allowed_unit_ids = $pdo->query("SELECT id FROM unit")->fetchAll(PDO::FETCH_COLUMN);
+} else {
+    $allowed_unit_ids = getSubUnitIds($unit_id, true);
+}
 $allowed_placeholders = implode(',', array_fill(0, count($allowed_unit_ids), '?'));
 
 $message = '';

@@ -24,7 +24,7 @@ function getCurrentUser() {
 // 权限检查
 // 角色说明：
 //   super_admin —— 系统管理员，拥有全部权限
-//   inspector   —— 监查员，与系统管理员可见菜单一致，但对【品类管理】【物资管理】只读
+//   inspector   —— 监察员，与系统管理员可见菜单一致，但对【品类管理】【物资管理】只读
 //   unit_admin  —— 单位管理员
 //   operator    —— 普通操作员
 function checkPermission($required_role = null) {
@@ -35,7 +35,7 @@ function checkPermission($required_role = null) {
     }
     if ($required_role) {
         $allowed = false;
-        // 监查员视为与 super_admin 同级的“查看”权限，可进入任何受 super_admin 保护的页面
+        // 监察员视为与 super_admin 同级的“查看”权限，可进入任何受 super_admin 保护的页面
         if ($required_role == 'super_admin' && in_array($user['role'], ['super_admin','inspector'])) $allowed = true;
         if ($required_role == 'unit_admin' && in_array($user['role'], ['super_admin','inspector','unit_admin'])) $allowed = true;
         if ($required_role == 'operator' && in_array($user['role'], ['super_admin','inspector','unit_admin','operator'])) $allowed = true;
@@ -47,7 +47,7 @@ function checkPermission($required_role = null) {
 }
 
 // 是否拥有对“品类管理 / 物资管理”页面的写操作权限
-// 监查员仅可查看，不可新增/编辑/删除/导入
+// 监察员仅可查看，不可新增/编辑/删除/导入
 function canManageMaterial($user = null) {
     if ($user === null) $user = getCurrentUser();
     if (!$user) return false;

@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 $user = checkPermission('unit_admin');
-// 监查员与系统管理员共享“可见所有单位”的范围
+// 监察员与系统管理员共享“可见所有单位”的范围
 $is_super = in_array($user['role'], ['super_admin','inspector']);
 $unit_id = $user['unit_id'];
 $message = '';
@@ -105,7 +105,7 @@ $users = $stmt->fetchAll();
 // 角色英文 → 中文映射
 $role_labels = [
     'super_admin' => '系统管理员',
-    'inspector'   => '监查员',
+    'inspector'   => '监察员',
     'unit_admin'  => '单位管理员',
     'operator'    => '普通操作员',
 ];
@@ -186,7 +186,7 @@ include 'includes/header.php';
         <div class="mb-3"><label>职务</label><input type="text" name="position" class="form-control"></div>
         <div class="mb-3"><label>权限*</label><select name="role" class="form-select" required>
             <?php if($is_super): ?><option value="super_admin">系统管理员</option><?php endif; ?>
-            <?php if($is_super): ?><option value="inspector">监查员</option><?php endif; ?>
+            <?php if($is_super): ?><option value="inspector">监察员</option><?php endif; ?>
             <option value="unit_admin">单位管理员</option>
             <option value="operator">普通操作员</option>
         </select></div>
@@ -207,7 +207,7 @@ include 'includes/header.php';
         <div class="mb-3"><label>职务</label><input type="text" name="position" id="edit_position" class="form-control"></div>
         <div class="mb-3"><label>权限</label><select name="role" id="edit_role" class="form-select">
             <?php if($is_super): ?><option value="super_admin">系统管理员</option><?php endif; ?>
-            <?php if($is_super): ?><option value="inspector">监查员</option><?php endif; ?>
+            <?php if($is_super): ?><option value="inspector">监察员</option><?php endif; ?>
             <option value="unit_admin">单位管理员</option>
             <option value="operator">普通操作员</option>
         </select></div>
