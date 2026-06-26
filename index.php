@@ -332,6 +332,7 @@ $cardGradients = [
                 <li class="nav-item"><a class="nav-link" href="category_manage.php">品类管理</a></li>
                 <?php endif; ?>
                 <li class="nav-item"><a class="nav-link" href="material.php">物资管理</a></li>
+                <li class="nav-item"><a class="nav-link" href="material_query.php">物资查询</a></li>
                 <li class="nav-item"><a class="nav-link" href="data_manage.php">数据导出</a></li>
                 <?php if($user['role'] == 'super_admin'): ?>
                 <li class="nav-item"><a class="nav-link" href="log_view.php">日志管理</a></li>
